@@ -12,17 +12,16 @@
 #include <stdbool.h>
 
 
-#include <sys/socket.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 
 #ifndef CHATROOM_UTILS_H_
 #define CHATROOM_UTILS_H_
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdio.h>
+
 #include "payload.pb.h"
 
 
@@ -325,8 +324,12 @@ void handle_server_message(connection_info *connection)
     break;
 
     case GET_USERS:
-      printf("%s", msg.data);
+    {
+      char* hey = inet_ntoa(connection->address.sin_addr);
+      printf("%s ip: %s\n", msg.data, hey);
+     
     break;
+    }
 
     case SET_USERNAME:
       //TODO: implement: name changes in the future?
