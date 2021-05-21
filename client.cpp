@@ -186,6 +186,8 @@ void connect_to_server(connection_info *connection, char *address, char *port)
 
   puts("Conectado al servido.");
   puts("Escriba /help para ayuda.");
+  Payload register_payload;
+  register_payload.set_sender(username);
 }
 
 
