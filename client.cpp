@@ -106,6 +106,9 @@ void get_username(char *username)
     memset(username, 0, 1000);
     fgets(username, 22, stdin);
     trim_newline(username);
+    
+    Payload payload;
+    payload.set_sender(username);
 
     if(strlen(username) > 20)
     {
@@ -187,7 +190,7 @@ void connect_to_server(connection_info *connection, char *address, char *port)
   puts("Conectado al servido.");
   puts("Escriba /help para ayuda.");
   Payload register_payload;
-  register_payload.set_sender(username);
+  register_payload.set_sender(connection->username);
 }
 
 

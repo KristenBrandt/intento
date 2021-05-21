@@ -21,11 +21,6 @@
 #ifndef CHATROOM_UTILS_H_
 #define CHATROOM_UTILS_H_
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdio.h>
-
 //Enum of different messages possible.
 typedef enum
 {
