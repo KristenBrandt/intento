@@ -18,6 +18,8 @@
 
 #include <pthread.h>
 
+#include "payload.pb.h"
+
 #ifndef CHATROOM_UTILS_H_
 #define CHATROOM_UTILS_H_
 

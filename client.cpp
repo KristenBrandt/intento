@@ -105,9 +105,7 @@ void get_username(char *username)
     memset(username, 0, 1000);
     fgets(username, 22, stdin);
     trim_newline(username);
-    
-    Payload payload;
-    payload.set_sender(username);
+
 
     if(strlen(username) > 20)
     {
@@ -164,7 +162,13 @@ void connect_to_server(connection_info *connection, char *address, char *port)
         perror("Error al hacer la conexion.");
         exit(1);
     }
-
+    
+    Payload register_payload;
+    register_payload.set_sender(connection->username);
+    char* ipAddr = inet_ntoa(connection->address.sin_addr);
+    register_payload.set_ip(ipAddr);
+    register_payload.set_flag(Payload_PayloadFlag::Payload_PayloadFlag_register_);  
+    
     set_username(connection);
 
     message msg;
@@ -188,8 +192,6 @@ void connect_to_server(connection_info *connection, char *address, char *port)
 
   puts("Conectado al servido.");
   puts("Escriba /help para ayuda.");
-  Payload register_payload;
-  register_payload.set_sender(connection->username);
 }
 
 
@@ -213,6 +215,8 @@ void handle_user_input(connection_info *connection)
         perror("Error al enviar mensaje");
         exit(1);
     }
+    Payload payload;
+    payload.set_flag(Payload_PayloadFlag::Payload_PayloadFlag_user_list);
   }
   else if(strcmp(input, "/h") == 0 || strcmp(input, "/help") == 0)
   {
@@ -265,6 +269,10 @@ void handle_user_input(connection_info *connection)
         perror("Error al enviar mensaje");
         exit(1);
     }
+    Payload payload;
+    payload.set_flag(Payload_PayloadFlag::Payload_PayloadFlag_private_chat);
+    payload.set_extra(toUsername);
+    payload.set_message(chatMsg);
 
   }
   else //regular public message
@@ -287,6 +295,9 @@ void handle_user_input(connection_info *connection)
         perror("Error al enviar mensaje");
         exit(1);
     }
+    Payload payload;
+    payload.set_flag(Payload_PayloadFlag::Payload_PayloadFlag_general_chat);
+    payload.set_message(input);
   }
 
 
@@ -311,7 +322,19 @@ void handle_server_message(connection_info *connection)
     puts("Servidor desconectado.");
     exit(0);
   }
-
+  else if(recv_val > 0)
+  {
+    Payload server_payload;
+    //server_payload.ParseFromString(msg);
+    if (server_payload.code() == 200 || server_payload.flag() == Payload_PayloadFlag::Payload_PayloadFlag_general_chat)
+    {
+        printf("%s \n", server_payload.message().c_str());
+    }
+    else
+    {
+        printf("Error del server %d -- %s!\n", server_payload.code(), server_payload.message().c_str());
+    }
+  }
   switch(msg.type)
   {
 
@@ -325,14 +348,14 @@ void handle_server_message(connection_info *connection)
 
     case GET_USERS:
     {
-      char* hey = inet_ntoa(connection->address.sin_addr);
-      printf("%s ip: %s\n", msg.data, hey);
+      char* ipAddres = inet_ntoa(connection->address.sin_addr);
+      printf("%s ip: %s\n", msg.data, ipAddres);
      
     break;
     }
 
     case SET_USERNAME:
-      //TODO: implement: name changes in the future?
+    //TODO
     break;
 
     case PUBLIC_MESSAGE:
